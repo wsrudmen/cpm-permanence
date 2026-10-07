@@ -86,7 +86,7 @@ h2.month { font-family: var(--font-display); font-size: 1.25rem; margin: 26px 0 
 <div class="wrap">
   <header>
     <h1>Permanences CPM - Equipe SUD</h1>
-    <p class="sub">1er et dernier samedi de chaque mois, du 5 septembre 2026 au 26 juin 2027. Chacun se positionne sur les dates où il assure la permanence.</p>
+    <p class="sub">1er et 4e samedi de chaque mois, du 5 septembre 2026 au 26 juin 2027. Chacun se positionne sur les dates où il assure la permanence.</p>
   </header>
 
   <div class="who">
@@ -133,7 +133,7 @@ h2.month { font-family: var(--font-display); font-size: 1.25rem; margin: 26px 0 
     var y = ym[0], m = ym[1], last = new Date(y, m, 0).getDate(), sats = [];
     for (var d = 1; d <= last; d++) if (new Date(y, m - 1, d).getDay() === 6) sats.push(d);
     DATES.push({ id: ymd(y, m, sats[0]), y: y, m: m, d: sats[0], label: "1er samedi" });
-    DATES.push({ id: ymd(y, m, sats[sats.length - 1]), y: y, m: m, d: sats[sats.length - 1], label: "Dernier samedi" });
+    DATES.push({ id: ymd(y, m, sats[3]), y: y, m: m, d: sats[3], label: "4e samedi" });
   });
 
   var fmtDay = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" });
