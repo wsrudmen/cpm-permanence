@@ -185,8 +185,7 @@ h2.month { font-family: var(--font-display); font-size: 1.25rem; margin: 26px 0 
       if (e && e.status === "yes") yes.push({ m: m, at: e.at, done: e.done === true });
       else if (e && e.status === "no") no.push({ m: m, at: e.at });
     });
-    yes.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
-    no.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
+    // MEMBERS est déjà classé par équipe puis par ordre alphabétique : on garde cet ordre
     return { yes: yes, no: no };
   }
 
@@ -311,6 +310,12 @@ h2.month { font-family: var(--font-display); font-size: 1.25rem; margin: 26px 0 
     var mem = await sb.from("members").select("id,team,name,sort").order("sort", { ascending: true });
     if (mem.error) throw mem.error;
     var list = (mem.data || []).filter(function (m) { return m && m.id && m.name; });
+    // Équipes dans l'ordre de la base, puis noms par ordre alphabétique au sein de chaque équipe
+    var teamOrder = {}, nTeams = 0;
+    list.forEach(function (m) { if (!(m.team in teamOrder)) teamOrder[m.team] = nTeams++; });
+    list.sort(function (a, b) {
+      return (teamOrder[a.team] - teamOrder[b.team]) || String(a.name).localeCompare(String(b.name), "fr", { sensitivity: "base" });
+    });
     var sig = JSON.stringify(list);
     if (sig !== memSig) {
       memSig = sig;
