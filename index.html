@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Permanences CPM - Equipe SUD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f2f6f6; --surface: #ffffff; --fg: #11262b; --muted: #5b6f74; --line: #d5e0e1;
+  --accent: #0d6f7a; --accent-fg: #ffffff; --accent-soft: #dcf0f1;
+  --yes: #1f7a45; --yes-soft: #dff2e5; --no: #a8433b; --no-soft: #f8e3e0;
+  --warn: #8a5a00; --warn-soft: #fbefd2;
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #0d1a1d; --surface: #14262a; --fg: #e6f0f0; --muted: #94aaae; --line: #26403f;
+    --accent: #5cc4cf; --accent-fg: #06191c; --accent-soft: #17383c;
+    --yes: #6fd391; --yes-soft: #173a25; --no: #f09a90; --no-soft: #402220;
+    --warn: #f0c46a; --warn-soft: #3b2f12;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.45; padding-inline: 16px; padding-block: 0 48px; }
+.wrap { max-width: 920px; margin-inline: auto; }
+header { padding-block: 28px 18px; }
+h1 { font-family: var(--font-display); font-size: clamp(1.7rem, 5vw, 2.4rem); line-height: 1.1; margin: 0 0 6px; text-wrap: balance; letter-spacing: -0.01em; }
+.sub { color: var(--muted); margin: 0; }
+.who { position: sticky; top: 0; z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; }
+.who label { font-weight: 600; }
+.who select { font: inherit; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); min-width: 0; max-width: 100%; }
+.who .hint { color: var(--muted); font-size: 0.88rem; flex-basis: 100%; }
+.kpis { display: flex; flex-wrap: wrap; gap: 8px 22px; padding-block: 16px 6px; font-variant-numeric: tabular-nums; }
+.kpis b { font-family: var(--font-display); font-size: 1.35rem; margin-right: 4px; }
+.kpis span { color: var(--muted); }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; padding-block: 10px 4px; }
+.tabs button, .actions button { font: inherit; cursor: pointer; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 7px 12px; }
+.tabs button[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.tabs .sep { width: 12px; }
+button:focus-visible, select:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.notice { margin-block: 12px 0; padding: 10px 12px; border-radius: 6px; background: var(--warn-soft); color: var(--warn); font-size: 0.92rem; }
+.notice[hidden] { display: none; }
+h2.month { font-family: var(--font-display); font-size: 1.25rem; margin: 26px 0 10px; text-transform: capitalize; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 330px), 1fr)); gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.card.past { opacity: 0.62; }
+.card.mine { border-color: var(--yes); box-shadow: 0 0 0 1px var(--yes); }
+.card.free { border-style: dashed; }
+.card-head { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.date { font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; text-transform: capitalize; }
+.tag { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.count { display: flex; flex-wrap: wrap; gap: 6px; font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.pill { padding: 2px 9px; border-radius: 999px; font-weight: 500; }
+.pill.status { font-size: 0.95rem; font-weight: 600; padding: 4px 14px; }
+.pill.status.ok { background: var(--yes); color: var(--bg); }
+.pill.status.free { background: transparent; color: var(--muted); border: 1px dashed var(--muted); }
+.rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.rows li { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; padding: 5px 8px; border-radius: 6px; min-width: 0; }
+.rows li.yes { background: var(--yes-soft); }
+.rows li.no { background: var(--no-soft); }
+.rows .nm { font-weight: 600; }
+.rows .tm { color: var(--muted); font-size: 0.82rem; font-variant-numeric: tabular-nums; }
+.rows .tm i { font-style: normal; font-weight: 600; margin-right: 6px; }
+.rows li.yes .tm i { color: var(--yes); }
+.rows li.no .tm i { color: var(--no); }
+.actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding-top: 8px; border-top: 1px dashed var(--line); }
+.actions .lab { font-size: 0.85rem; color: var(--muted); flex-basis: 100%; }
+.actions button.on-yes { background: var(--yes); border-color: var(--yes); color: var(--bg); }
+.actions button.on-no { background: var(--no); border-color: var(--no); color: var(--bg); }
+.actions button:disabled { opacity: 0.5; cursor: progress; }
+.journal { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.journal li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; }
+.journal .when { color: var(--muted); font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+.empty-state { color: var(--muted); padding: 24px 0; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Permanences CPM - Equipe SUD</h1>
+    <p class="sub">1er et dernier samedi de chaque mois, du 5 septembre 2026 au 26 juin 2027. Chacun se positionne sur les dates où il assure la permanence.</p>
+  </header>
+
+  <div class="who">
+    <label for="who">Vous êtes</label>
+    <select id="who"></select>
+    <span class="hint" id="whoHint">Choisissez votre nom pour pouvoir vous positionner.</span>
+  </div>
+
+  <div class="notice" id="notice" hidden></div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs" role="group" aria-label="Affichage">
+    <button type="button" data-view="all" aria-pressed="true" id="tab-all">Toutes les dates</button>
+    <button type="button" data-view="open" aria-pressed="false" id="tab-open">Dates libres</button>
+    <button type="button" data-view="mine" aria-pressed="false" id="tab-mine">Mes dates</button>
+    <span class="sep"></span>
+    <button type="button" data-view="journal" aria-pressed="false" id="tab-journal">Historique</button>
+  </div>
+
+  <main id="main"></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="config.js"></script>
+<script>
+(function () {
+  // Les membres sont chargés depuis la base (table "members") : aucun nom n'est écrit dans le code.
+  var MEMBERS = [];
+  var BYID = {};
+  var memSig = "";
+  var status = "loading";
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+  function ymd(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
+
+  var DATES = [];
+  [[2026, 9], [2026, 10], [2026, 11], [2026, 12], [2027, 1], [2027, 2], [2027, 3], [2027, 4], [2027, 5], [2027, 6]].forEach(function (ym) {
+    var y = ym[0], m = ym[1], last = new Date(y, m, 0).getDate(), sats = [];
+    for (var d = 1; d <= last; d++) if (new Date(y, m - 1, d).getDay() === 6) sats.push(d);
+    DATES.push({ id: ymd(y, m, sats[0]), y: y, m: m, d: sats[0], label: "1er samedi" });
+    DATES.push({ id: ymd(y, m, sats[sats.length - 1]), y: y, m: m, d: sats[sats.length - 1], label: "Dernier samedi" });
+  });
+
+  var fmtDay = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  var fmtMonth = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
+  var fmtStamp = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  function dayLabel(dt) { return fmtDay.format(new Date(dt.y, dt.m - 1, dt.d)); }
+  function stamp(iso) { var t = new Date(iso); return isNaN(t) ? "" : fmtStamp.format(t); }
+
+  var now = new Date();
+  var TODAY = ymd(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+  var pos = {};
+  var journal = [];
+  var busy = {};
+  var sb = null;
+  var view = "all";
+  var me = "";
+  var online = false;
+
+  try { me = localStorage.getItem("cpm-sud-me") || ""; } catch (e) {}
+
+  var $who = document.getElementById("who");
+  var $hint = document.getElementById("whoHint");
+  var $notice = document.getElementById("notice");
+  var $kpis = document.getElementById("kpis");
+  var $main = document.getElementById("main");
+
+  function buildSelect() {
+    var h = '<option value="">Choisir mon nom…</option>';
+    var teams = [];
+    MEMBERS.forEach(function (m) { if (teams.indexOf(m.team) < 0) teams.push(m.team); });
+    teams.forEach(function (team) {
+      h += '<optgroup label="Equipe ' + esc(team) + '">';
+      MEMBERS.forEach(function (m) {
+        if (m.team === team) h += '<option value="' + esc(m.id) + '">' + esc(m.name) + "</option>";
+      });
+      h += "</optgroup>";
+    });
+    $who.innerHTML = h;
+    $who.value = me;
+  }
+
+  function entry(dateId, memberId) { return pos[dateId + "__" + memberId]; }
+
+  function summarize(dt) {
+    var yes = [], no = [];
+    MEMBERS.forEach(function (m) {
+      var e = entry(dt.id, m.id);
+      if (e && e.status === "yes") yes.push({ m: m, at: e.at, done: e.done === true });
+      else if (e && e.status === "no") no.push({ m: m, at: e.at });
+    });
+    yes.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
+    no.sort(function (a, b) { return String(a.at).localeCompare(String(b.at)); });
+    return { yes: yes, no: no };
+  }
+
+  function rowHtml(item, cls, word) {
+    var when = item.done ? "" : stamp(item.at);
+    var label = item.done ? "Permanence assurée" : word;
+    return '<li class="' + cls + '"><span class="nm">' + esc(item.m.name) + ' <span class="tag">' + esc(item.m.team) + '</span></span>' +
+      '<span class="tm"><i>' + label + "</i>" + when + "</span></li>";
+  }
+
+  function cardHtml(dt) {
+    var s = summarize(dt);
+    var past = dt.id < TODAY;
+    var mine = me && entry(dt.id, me) && entry(dt.id, me).status === "yes";
+    var h = '<article class="card' + (past ? " past" : "") + (mine ? " mine" : "") + (s.yes.length ? "" : " free") + '">';
+    h += '<div class="card-head"><span class="date">' + dayLabel(dt) + '</span><span class="tag">' + dt.label + (past ? " · passé" : "") + "</span></div>";
+    h += '<div class="count">';
+    var allDone = s.yes.length > 0 && s.yes.every(function (i) { return i.done; });
+    h += s.yes.length ? '<span class="pill status ok">OK · ' + (allDone ? "assurée" : "validé") + "</span>" : '<span class="pill status free">Libre</span>';
+    h += "</div>";
+    if (s.yes.length || s.no.length) {
+      h += '<ul class="rows">';
+      s.yes.forEach(function (i) { h += rowHtml(i, "yes", "Positionné le "); });
+      s.no.forEach(function (i) { h += rowHtml(i, "no", "Indisponible le "); });
+      h += "</ul>";
+    }
+    if (me && online) {
+      var cur = entry(dt.id, me) ? entry(dt.id, me).status : "";
+      var b = busy[dt.id + "__" + me] ? " disabled" : "";
+      h += '<div class="actions"><span class="lab">Votre réponse (' + esc(BYID[me].name) + ")</span>";
+      h += '<button type="button" data-act="yes" data-date="' + dt.id + '" class="' + (cur === "yes" ? "on-yes" : "") + '"' + b + ' aria-pressed="' + (cur === "yes") + '">Je me positionne</button>';
+      h += '<button type="button" data-act="no" data-date="' + dt.id + '" class="' + (cur === "no" ? "on-no" : "") + '"' + b + ' aria-pressed="' + (cur === "no") + '">Indisponible</button>';
+      if (cur) h += '<button type="button" data-act="none" data-date="' + dt.id + '"' + b + ">Effacer</button>";
+      h += "</div>";
+    }
+    return h + "</article>";
+  }
+
+  function renderKpis() {
+    var covered = 0, myCount = 0;
+    DATES.forEach(function (dt) {
+      if (summarize(dt).yes.length) covered++;
+      if (me && entry(dt.id, me) && entry(dt.id, me).status === "yes") myCount++;
+    });
+    var h = '<div><b>' + covered + "/" + DATES.length + "</b><span>dates validées</span></div>";
+    h += '<div><b>' + (DATES.length - covered) + "</b><span>dates libres</span></div>";
+    if (me) h += '<div><b>' + myCount + "</b><span>dates où vous êtes positionné(e)</span></div>";
+    $kpis.innerHTML = h;
+  }
+
+  function renderJournal() {
+    if (!journal.length) {
+      return '<p class="empty-state">Aucun positionnement pour le moment. Chaque réponse apparaîtra ici avec sa date et son heure.</p>';
+    }
+    var verbs = { yes: "s'est positionné(e)", no: "est indisponible", none: "a retiré sa réponse" };
+    var h = '<ul class="journal">';
+    journal.forEach(function (j) {
+      var m = BYID[j.member];
+      var dt = DATES.filter(function (d) { return d.id === j.date; })[0];
+      if (!m || !dt || !verbs[j.status]) return;
+      var verb = (j.done === true && j.status === "yes") ? "a assuré la permanence" : verbs[j.status];
+      var whenTxt = (j.done === true) ? "Historique" : stamp(j.at);
+      h += "<li><span><b>" + esc(m.name) + "</b> " + verb + " · " + dayLabel(dt) + " " + dt.y + '</span><span class="when">' + whenTxt + "</span></li>";
+    });
+    return h + "</ul>";
+  }
+
+  function render() {
+    if (status !== "ready") {
+      $kpis.innerHTML = "";
+      $main.innerHTML = '<p class="empty-state">' + (status === "loading" ? "Chargement du calendrier…" : "Le calendrier est indisponible pour le moment.") + "</p>";
+      return;
+    }
+    renderKpis();
+    if (view === "journal") { $main.innerHTML = renderJournal(); return; }
+    var list = DATES.filter(function (dt) {
+      if (view === "open") return summarize(dt).yes.length === 0;
+      if (view === "mine") return me && entry(dt.id, me) && entry(dt.id, me).status === "yes";
+      return true;
+    });
+    if (!list.length) {
+      $main.innerHTML = '<p class="empty-state">' + (view === "mine" ? (me ? "Vous n'êtes positionné(e) sur aucune date pour le moment." : "Choisissez votre nom pour voir vos dates.") : "Toutes les dates sont validées, aucune n'est libre.") + "</p>";
+      return;
+    }
+    var h = "", curKey = "";
+    list.forEach(function (dt) {
+      var key = dt.y + "-" + dt.m;
+      if (key !== curKey) {
+        if (curKey) h += "</div>";
+        h += '<h2 class="month">' + fmtMonth.format(new Date(dt.y, dt.m - 1, 1)) + '</h2><div class="grid">';
+        curKey = key;
+      }
+      h += cardHtml(dt);
+    });
+    $main.innerHTML = h + "</div>";
+  }
+
+  function showNotice(txt) { $notice.textContent = txt; $notice.hidden = !txt; }
+
+  function updateHint() {
+    if (!online) $hint.textContent = "Lecture seule : la connexion aux données n'est pas disponible.";
+    else if (!me) $hint.textContent = "Choisissez votre nom pour pouvoir vous positionner.";
+    else $hint.textContent = "Utilisez les boutons de chaque date pour vous positionner.";
+  }
+
+  $who.addEventListener("change", function () {
+    me = $who.value;
+    try { localStorage.setItem("cpm-sud-me", me); } catch (e) {}
+    updateHint();
+    render();
+  });
+
+  document.querySelector(".tabs").addEventListener("click", function (ev) {
+    var b = ev.target.closest("button[data-view]");
+    if (!b) return;
+    view = b.getAttribute("data-view");
+    document.querySelectorAll(".tabs button").forEach(function (x) { x.setAttribute("aria-pressed", String(x === b)); });
+    render();
+  });
+
+  async function loadAll() {
+    var mem = await sb.from("members").select("id,team,name,sort").order("sort", { ascending: true });
+    if (mem.error) throw mem.error;
+    var list = (mem.data || []).filter(function (m) { return m && m.id && m.name; });
+    var sig = JSON.stringify(list);
+    if (sig !== memSig) {
+      memSig = sig;
+      MEMBERS = list;
+      BYID = {};
+      MEMBERS.forEach(function (m) { BYID[m.id] = m; });
+      if (me && !BYID[me]) me = "";
+      buildSelect();
+    }
+    var p = await sb.from("positions").select("date,member,status,done,at");
+    if (p.error) throw p.error;
+    var next = {};
+    (p.data || []).forEach(function (r) {
+      if (BYID[r.member] && (r.status === "yes" || r.status === "no")) next[r.date + "__" + r.member] = r;
+    });
+    pos = next;
+    var j = await sb.from("journal").select("date,member,status,done,at").order("at", { ascending: false }).limit(80);
+    if (j.error) throw j.error;
+    journal = j.data || [];
+    render();
+  }
+
+  $main.addEventListener("click", async function (ev) {
+    var b = ev.target.closest("button[data-act]");
+    if (!b || !sb || !me) return;
+    var act = b.getAttribute("data-act"), dateId = b.getAttribute("data-date");
+    var key = dateId + "__" + me;
+    if (busy[key]) return;
+    busy[key] = true; render();
+    var at = new Date().toISOString();
+    try {
+      var r;
+      if (act === "none") r = await sb.from("positions").delete().eq("date", dateId).eq("member", me);
+      else r = await sb.from("positions").upsert({ date: dateId, member: me, status: act, done: false, at: at }, { onConflict: "date,member" });
+      if (r.error) throw r.error;
+      var jr = await sb.from("journal").insert({ date: dateId, member: me, status: act, done: false, at: at });
+      if (jr.error) throw jr.error;
+      await loadAll();
+      showNotice("");
+    } catch (e) {
+      showNotice("Votre réponse n'a pas pu être enregistrée. Vérifiez votre connexion, puis réessayez.");
+    } finally {
+      delete busy[key]; render();
+    }
+  });
+
+  async function init() {
+    buildSelect(); updateHint(); render();
+    var cfg = window.CPM_CONFIG || {};
+    if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY || /VOTRE/.test(cfg.SUPABASE_URL + cfg.SUPABASE_ANON_KEY)) {
+      status = "error"; render();
+      showNotice("Configuration manquante : renseignez l'adresse et la clé Supabase dans le fichier config.js.");
+      return;
+    }
+    sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+    try {
+      await loadAll();
+      online = true; status = "ready"; updateHint(); render();
+    } catch (e) {
+      status = "error"; render();
+      showNotice("Impossible de lire les données. Vérifiez la configuration de la base (scripts SQL).");
+      return;
+    }
+    try {
+      sb.channel("cpm-sud").on("postgres_changes", { event: "*", schema: "public" }, function () {
+        loadAll().catch(function () {});
+      }).subscribe();
+    } catch (e) {}
+    setInterval(function () { if (!document.hidden) loadAll().catch(function () {}); }, 30000);
+  }
+  init();
+})();
+</script>
+</body>
+</html>
